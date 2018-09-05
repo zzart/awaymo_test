@@ -3,8 +3,8 @@ import urllib
 import requests
 import xmltodict
 from datetime import date
-from config.settings import get_config
 from collections import namedtuple
+from config.settings import get_config
 from utils.logger import logger
 from xml.parsers.expat import ExpatError
 from .listings import Listing
@@ -28,7 +28,7 @@ params = namedtuple('params', [
 ])
 
 
-class XmlClient(object):
+class XmlParser(object):
     """ Basic xml client for retrieving data from the upstream API """
 
     @classmethod
@@ -57,7 +57,6 @@ class XmlClient(object):
             logger.error(f"Missing param or wrong name. {e}")
         else:
             response = requests.get(API_URL, query_params)
-
             try:
                 response.raise_for_status()
             except requests.exceptions.HTTPError as e:

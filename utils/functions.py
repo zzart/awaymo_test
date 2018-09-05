@@ -19,3 +19,11 @@ def JSONhandler(obj):
     if isinstance(obj, memoryview):
         return bytes(obj)
     return json.JSONEncoder().default(obj)
+
+
+def get_time(time_str: str, format_time: str)-> datetime.time:
+    try:
+        return datetime.datetime.strptime(time_str, format_time).time()
+    except ValueError:
+        raise ValueError
+
