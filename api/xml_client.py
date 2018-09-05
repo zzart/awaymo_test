@@ -28,7 +28,7 @@ params = namedtuple('params', [
 
 
 class XmlClient(object):
-    """ Basic xml client for retrieving data from the upstream API"""
+    """ Basic xml client for retrieving data from the upstream API """
 
     @classmethod
     def get_listings(cls):

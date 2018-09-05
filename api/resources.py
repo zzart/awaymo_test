@@ -3,8 +3,9 @@ import simplejson
 from falcon.status_codes import HTTP_200, HTTP_400
 from utils.functions import JSONhandler
 from utils.logger import logger
-from .filter import filter_results
+from .filter import get_results
 from .xml_client import XmlClient
+from .listings import prepare_search_results
 
 
 class SearchResource(object):
@@ -32,8 +33,8 @@ class SearchResource(object):
             logger.info(e)
             resp.status = HTTP_400
         else:
-            search_results = filter_results(offers=XmlClient.get_listings(), search_criteria=args)
-            resp.body = simplejson.dumps([result for result in search_results], indent=2, default=JSONhandler)
+            search_results = get_results(offers=XmlClient.get_listings(), search_criteria=args)
+            resp.body = simplejson.dumps(prepare_search_results(search_results), indent=2, default=JSONhandler)
             resp.status = HTTP_200
 
 
