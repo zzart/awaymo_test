@@ -6,11 +6,11 @@ import falcon
 from falcon.status_codes import HTTP_200, HTTP_400
 from falcon.http_error import HTTPError
 from falcondocs import FalconDocumentationResource, FalconDocumentationRouter
-from utils.functions import JSONhandler, get_time
+from utils.functions import json_handler, get_time
 from utils.logger import logger
 from config.settings import get_config
-from .xml_parser import XmlParser
-from .listings import prepare_search_results, get_results
+from api.xml_parser import XmlParser
+from api.listings import prepare_search_results, get_results
 
 TIME_FORMAT = get_config('time_format')
 
@@ -65,7 +65,7 @@ class SearchResource(object):
             resp.status = HTTP_400
         else:
             search_results = get_results(listings=XmlParser.get_listings(), search_criteria=args)
-            resp.body = simplejson.dumps(prepare_search_results(search_results), indent=2, default=JSONhandler)
+            resp.body = simplejson.dumps(prepare_search_results(search_results), indent=2, default=json_handler)
             resp.status = HTTP_200
 
 

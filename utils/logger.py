@@ -1,3 +1,6 @@
+""" Module used for logging """
+# pylint: disable=invalid-name
+
 import logging
 from socket import gethostname
 

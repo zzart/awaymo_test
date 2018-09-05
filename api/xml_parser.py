@@ -1,12 +1,15 @@
+""" XMLParser """
+# pylint: disable=too-few-public-methods
+
 import re
 import urllib
-import requests
-import xmltodict
 from datetime import date
 from collections import namedtuple
+from xml.parsers.expat import ExpatError
+import requests
+import xmltodict
 from config.settings import get_config
 from utils.logger import logger
-from xml.parsers.expat import ExpatError
 from .listings import Listing
 
 API_URL = get_config('api_endpoint')
@@ -29,7 +32,7 @@ params = namedtuple('params', [
 
 
 class XmlParser(object):
-    """ Basic xml client for retrieving data from the upstream API """
+    """ Basic xml parser for retrieving data from the upstream API """
 
     @classmethod
     def get_listings(cls):
@@ -74,7 +77,7 @@ class XmlParser(object):
             logger.error(e)
         else:
             parsed_offers = []
-            if len(offers) > 0:
+            if offers:
                 for offer in offers:
                     try:
                         parsed_offers.append(
