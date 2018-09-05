@@ -1,4 +1,5 @@
 """ Main entry point of uwsgi routes """
+# pylint: disable=invalid-name,unused-argument,too-few-public-methods,no-self-use
 
 import decimal
 from decimal import Decimal
@@ -57,12 +58,16 @@ class SearchResource(object):
 
         try:
             args = {
-                'earliest_departure_time': get_time(req.get_param('earliest_departure_time'), TIME_FORMAT)
-                if req.get_param('earliest_departure_time') else None,
-                'earliest_return_time': get_time(req.get_param('earliest_return_time'), TIME_FORMAT)
-                if req.get_param('earliest_return_time') else None,
-                'max_price': Decimal(req.get_param('max_price')) if req.get_param('max_price') else None,
-                'min_price': Decimal(req.get_param('min_price')) if req.get_param('min_price') else None,
+                'earliest_departure_time': get_time(
+                    req.get_param('earliest_departure_time'), TIME_FORMAT)
+                                           if req.get_param('earliest_departure_time') else None,
+                'earliest_return_time': get_time(
+                    req.get_param('earliest_return_time'), TIME_FORMAT)
+                                        if req.get_param('earliest_return_time') else None,
+                'max_price': Decimal(req.get_param('max_price'))
+                             if req.get_param('max_price') else None,
+                'min_price': Decimal(req.get_param('min_price'))
+                             if req.get_param('min_price') else None,
                 'star_rating': req.get_param_as_int('star_rating') or None,
             }
             # get rid of empty keys
@@ -75,7 +80,8 @@ class SearchResource(object):
             resp.status = HTTP_400
         else:
             search_results = get_results(listings=XmlParser.get_listings(), search_criteria=args)
-            resp.body = simplejson.dumps(prepare_search_results(search_results), indent=2, default=json_handler)
+            resp.body = simplejson.dumps(
+                prepare_search_results(search_results), indent=2, default=json_handler)
             resp.status = HTTP_200
 
 
@@ -99,7 +105,7 @@ wsgi_app = api = falcon.API(
 
 api_ver = '/v1'
 
-# ROUTES ----------------------------------------------------------------------------------------------------------
+# ROUTES ----------------------------------------------------
 
 search_resource = SearchResource()
 api.add_route(api_ver + '/search', search_resource)

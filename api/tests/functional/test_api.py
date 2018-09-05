@@ -1,4 +1,4 @@
-import pytest
+# pylint: disable=missing-docstring, invalid-name
 
 
 def test_health(client):
@@ -17,7 +17,7 @@ def test_search_no_params(client, search_url):
 def test_search_single_param(client, search_url):
     result = client.simulate_get(search_url, params={'star_rating': 1})
     assert result.status_code == 200
-    assert len(result.json) > 0
+    assert result.json
 
 
 def test_search_no_results(client, search_url):

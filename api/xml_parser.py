@@ -1,5 +1,5 @@
 """ XMLParser """
-# pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods,invalid-name
 
 import re
 import urllib
@@ -17,6 +17,7 @@ DATE_FORMAT = get_config('date_format')
 
 
 class Params(NamedTuple):
+    """Class for representing query parameters for upstream API """
     countryid: int
     page: str
     platform: str
@@ -36,7 +37,14 @@ class XmlParser(object):
 
     @classmethod
     def get_listings(cls):
-        query = Params(
+        """ Factory method for calling and parsing API response"""
+        params = cls._get_params()
+        response = cls._retrieve_listings(params)
+        return cls._parse_response(response.text)
+
+    @staticmethod
+    def _get_params():
+        return Params(
             countryid=1,
             page='SEARCH',
             platform='WEB',
@@ -50,8 +58,6 @@ class XmlParser(object):
             children=0,
             duration=7,
         )
-        response = cls._retrieve_listings(query)
-        return cls._parse_response(response.text)
 
     @staticmethod
     def _retrieve_listings(query_params: Params)-> str:
@@ -89,4 +95,3 @@ class XmlParser(object):
                     except TypeError as e:
                         logger.error(f"Missing field or wrong name. {e}")
             return parsed_offers
-
