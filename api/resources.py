@@ -1,33 +1,65 @@
 from decimal import Decimal
+from datetime import datetime
 import simplejson
+import falcon
 from falcon.status_codes import HTTP_200, HTTP_400
+from falcon.http_error import HTTPError
 from utils.functions import JSONhandler
 from utils.logger import logger
+from config.settings import get_config
 from .filter import get_results
 from .xml_client import XmlClient
 from .listings import prepare_search_results
+
+TIME_FORMAT = get_config('time_format')
+
+
+def check_times(req, resp, params):
+    """
+    Checks for well-formatted dates.
+    :param req: request object
+    :param resp: response object
+    :param params: dict of query params
+    :return: HTTP Error **400** or pass through upon successful validation
+    """
+    try:
+        if req.get_param('earliest_departure_time'):
+            datetime.strptime(req.get_param('earliest_departure_time'), TIME_FORMAT)
+        if req.get_param('earliest_return_time'):
+            datetime.strptime(req.get_param('earliest_return_time'), TIME_FORMAT)
+    except ValueError as e:
+        logger.error(e)
+        raise HTTPError(HTTP_400, "One of the time params could not be parsed.")
 
 
 class SearchResource(object):
     """ Search for offers matching search criteria """
 
-    def on_get(self, req, resp):
+    @falcon.before(check_times)
+    def on_get(self, req, resp, **params):
         """
         :param req: request object
         :param resp: response object
+        :param params: additional params passed upon request
         :returns: 200 with json obj or 400
         """
 
         try:
             args = {
-                'earliest_departure_time': req.get_param('earliest_departure_time') or None,
-                'earliest_return_time': req.get_param('earliest_return_time') or None,
+                'earliest_departure_time': datetime.strptime(
+                    req.get_param('earliest_departure_time'), TIME_FORMAT).time()
+                if req.get_param('earliest_departure_time') else None,
+                'earliest_return_time': datetime.strptime(
+                    req.get_param('earliest_return_time'), TIME_FORMAT).time()
+                if req.get_param('earliest_return_time') else None,
                 'max_price': Decimal(req.get_param('max_price')) if req.get_param('max_price') else None,
                 'min_price': Decimal(req.get_param('min_price')) if req.get_param('min_price') else None,
                 'star_rating': req.get_param_as_int('star_rating') or None,
             }
             # get rid of empty keys
             args = {k: v for k, v in args.items() if v}
+            if not args:
+                raise HTTPError(HTTP_400, 'Please supply at least one search criteria.')
 
         except ValueError as e:
             logger.info(e)
@@ -41,10 +73,11 @@ class SearchResource(object):
 class HealthResource(object):
     """ Ping me to check if I'm alive """
 
-    def on_get(self, req, resp):
+    def on_get(self, req, resp, *params):
         """
         :param req: request object
         :param resp: response object
+        :param params: additional params passed upon request
         :returns: 200
         """
         resp.body = simplejson.dumps({'status': 'ok'})

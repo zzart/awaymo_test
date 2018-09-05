@@ -1,9 +1,14 @@
 from typing import List
 from decimal import Decimal
+from utils.logger import logger
 from .listings import Listing
 
 
 def get_results(offers: List[Listing], search_criteria: dict)-> list:
+
+    if len(search_criteria) == 0:
+        logger.error('Value search_criteria empty')
+        raise ValueError('Please supply at least one search criteria')
 
     def filter_result(offer: Listing) -> bool:
         """ Determine if a single offer matches all search criteria """
@@ -25,5 +30,3 @@ def get_results(offers: List[Listing], search_criteria: dict)-> list:
         if filter_result(single_offer):
             results.append(single_offer)
     return results
-
-

@@ -10,6 +10,7 @@ from xml.parsers.expat import ExpatError
 from .listings import Listing
 
 API_URL = get_config('api_endpoint')
+DATE_FORMAT = get_config('date_format')
 
 params = namedtuple('params', [
     'countryid',
@@ -40,7 +41,7 @@ class XmlClient(object):
             regionid=4,
             areaid=9,
             resortid=0,
-            depdate=date(2018, 8, 15).strftime('%d/%m/%Y'),
+            depdate=date(2018, 8, 15).strftime(DATE_FORMAT),
             flex=0,
             adults=2,
             children=0,
