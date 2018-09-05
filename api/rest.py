@@ -1,5 +1,6 @@
 """ Main entry point of uwsgi routes """
 
+import decimal
 from decimal import Decimal
 import simplejson
 import falcon
@@ -15,7 +16,7 @@ from api.listings import prepare_search_results, get_results
 TIME_FORMAT = get_config('time_format')
 
 
-def check_times(req, resp, params):
+def check_types(req, resp, params):
     """
     Checks for well-formatted dates.
     :param req: request object
@@ -32,11 +33,20 @@ def check_times(req, resp, params):
         logger.error(e)
         raise HTTPError(HTTP_400, "One of the time params could not be parsed.")
 
+    try:
+        if req.get_param('max_price'):
+            Decimal(req.get_param('max_price'))
+        if req.get_param('min_price'):
+            Decimal(req.get_param('min_price'))
+    except decimal.InvalidOperation as e:
+        logger.error(e)
+        raise HTTPError(HTTP_400, "One of the price params could not be parsed.")
+
 
 class SearchResource(object):
     """ Search for offers matching search criteria """
 
-    @falcon.before(check_times)
+    @falcon.before(check_types)
     def on_get(self, req, resp, **params):
         """
         :param req: request object
