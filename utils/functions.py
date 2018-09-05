@@ -19,8 +19,6 @@ def json_handler(obj: Any)-> str:
         return "{}".format(obj)
     if isinstance(obj, set):
         return ", ".join(obj)
-    if isinstance(obj, memoryview):
-        return bytes(obj)
     return json.JSONEncoder().default(obj)
 
 

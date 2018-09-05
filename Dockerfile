@@ -18,9 +18,8 @@ ADD requirements.txt /awaymo/
 # Few extra packages needed for Cython
 RUN apk update && \
     apk add python3 python3-dev gcc musl-dev linux-headers libffi libffi-dev libressl-dev libxml2-dev libxslt-dev g++ pcre pcre-dev git && \
-    pip3 install --upgrade pip --no-cache-dir && \
     rm -fr /var/cache/apk/* && \
-    pip3 install -r requirements.txt --no-cache-dir && \
+    pip3 install -r requirements.txt
 
 USER dev
 
@@ -33,8 +32,6 @@ ADD utils          /awaymo/
 ENV PORT 8080
 
 EXPOSE ${PORT}
-
-EXPOSE ${DEBUGPORT}
 
 ENV AWAYMO_HOME /awaymo
 ENV PYTHONPATH /awaymo
