@@ -3,8 +3,8 @@
 
 import re
 import urllib
+from typing import List, NamedTuple
 from datetime import date
-from collections import namedtuple
 from xml.parsers.expat import ExpatError
 import requests
 import xmltodict
@@ -15,20 +15,20 @@ from .listings import Listing
 API_URL = get_config('api_endpoint')
 DATE_FORMAT = get_config('date_format')
 
-params = namedtuple('params', [
-    'countryid',
-    'page',
-    'platform',
-    'depart',
-    'regionid',
-    'areaid',
-    'resortid',
-    'depdate',
-    'flex',
-    'adults',
-    'children',
-    'duration',
-])
+
+class Params(NamedTuple):
+    countryid: int
+    page: str
+    platform: str
+    depart: str
+    regionid: int
+    areaid: int
+    resortid: int
+    depdate: str
+    flex: int
+    adults: int
+    children: int
+    duration: int
 
 
 class XmlParser(object):
@@ -36,7 +36,7 @@ class XmlParser(object):
 
     @classmethod
     def get_listings(cls):
-        response = cls._retrieve_listings(
+        query = Params(
             countryid=1,
             page='SEARCH',
             platform='WEB',
@@ -50,12 +50,13 @@ class XmlParser(object):
             children=0,
             duration=7,
         )
-        return cls._parse_response(response)
+        response = cls._retrieve_listings(query)
+        return cls._parse_response(response.text)
 
     @staticmethod
-    def _retrieve_listings(**kw):
+    def _retrieve_listings(query_params: Params)-> str:
         try:
-            query_params = params(**kw)._asdict()
+            query_params = query_params._asdict()
         except TypeError as e:
             logger.error(f"Missing param or wrong name. {e}")
         else:
@@ -68,22 +69,23 @@ class XmlParser(object):
                 return response
 
     @staticmethod
-    def _parse_response(response):
+    def _parse_response(response: str)-> List[Listing]:
         try:
             # NOTE: we are getting some chars we cannot parse with xmltodict, so getting rid of them
-            listings_cleaned = re.sub(r"\\r\\n|\\", '', response.text[1:-1])
-            offers = xmltodict.parse(listings_cleaned)['Container']['Results']['Offer']
+            listings_cleaned = re.sub(r"\\r\\n|\\", '', response[1:-1])
+            listings = xmltodict.parse(listings_cleaned)['Container']['Results']['Offer']
         except (ExpatError, TypeError) as e:
             logger.error(e)
+            raise ValueError
         else:
             parsed_offers = []
-            if offers:
-                for offer in offers:
+            if listings:
+                for listing in listings:
                     try:
                         parsed_offers.append(
                             Listing(
                                 **{k.strip('@').lower(): urllib.parse.unquote_plus(v)
-                                   for k, v in offer.items()}))
+                                   for k, v in listing.items()}))
                     except TypeError as e:
                         logger.error(f"Missing field or wrong name. {e}")
             return parsed_offers
