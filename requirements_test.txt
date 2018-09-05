@@ -1,4 +1,4 @@
+tox==3.2.1
 coverage==4.4.1
 pytest==3.2.1
-git+https://github.com/zzart/pytest-docker@184fe9aa210a7ca1d59d2d438ab43ababacced78#egg=pytest-docker
 pytest-mock==1.6.2

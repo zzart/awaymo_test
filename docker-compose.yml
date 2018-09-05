@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:
+      /bin/sh -c "tox"
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8080"
+    command:
+      /bin/sh -c "uwsgi --ini config/uwsgi.ini"
