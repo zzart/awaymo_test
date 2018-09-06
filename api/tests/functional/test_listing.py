@@ -1,4 +1,5 @@
 # pylint: disable=missing-docstring, invalid-name,redefined-outer-name
+from decimal import Decimal
 import pytest
 from api.listings import Listing, search_listings, prepare_search_results
 from utils.functions import format_time
@@ -163,3 +164,12 @@ def test_data_formatting(sample_data):
     assert isinstance(results, dict)
     assert 'summary' in results.keys()
     assert 'offers' in results.keys()
+
+
+def test_data_formatting_summary(sample_data):
+    doc = {
+        'most_expensive_price': Decimal('600'),
+        'cheapest_price': Decimal('100'),
+        'average_price': Decimal('350.00')}
+    results = prepare_search_results(sample_data)
+    assert results['summary'] == doc
