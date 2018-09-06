@@ -136,10 +136,30 @@ def test_departure_time(sample_data):
     assert not result
 
 
+def test_return_time(sample_data):
+    search_criteria = {
+        'max_price': None,
+        'min_price': None,
+        'star_rating': None,
+        'earliest_departure_time': None,
+        'earliest_return_time': format_time('10:00', TIME_FORMAT),
+    }
+    result = search_listings(sample_data, search_criteria)
+    assert len(result) == 5
+    search_criteria = {
+        'max_price': None,
+        'min_price': None,
+        'star_rating': 6,
+        'earliest_departure_time': None,
+        'earliest_return_time': format_time('21:00', TIME_FORMAT),
+    }
+    result = search_listings(sample_data, search_criteria)
+    assert not result
+
+
 def test_data_formatting(sample_data):
     results = prepare_search_results(sample_data)
     assert results
     assert isinstance(results, dict)
     assert 'summary' in results.keys()
     assert 'offers' in results.keys()
-
