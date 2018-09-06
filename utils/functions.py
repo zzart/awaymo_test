@@ -1,4 +1,4 @@
-""" Handy functions for dealing with JSON and time conversions """
+""" Helper functions for dealing with JSON and time conversions """
 
 import datetime
 import decimal
@@ -11,7 +11,7 @@ def json_handler(obj: Any)-> str:
     """
     Json Handler for formatting different python types into json
     :param obj: object of any type which needs to be serialized to json
-    :return: json serializable type (usually str)
+    :return: json serializable type
     """
     if isinstance(obj, datetime.date):
         return obj.isoformat()
@@ -22,14 +22,14 @@ def json_handler(obj: Any)-> str:
     return json.JSONEncoder().default(obj)
 
 
-def get_time(time_str: str, format_time: str)-> datetime.time:
+def format_time(time_str: str, format_str: str)-> datetime.time:
     """
     Given time_string converts to valid datetime.time
     :param time_str: ie. '20:34' or '23/02/2019 20:32'
-    :param format_time: ie '%H:%M'
+    :param format_str: ie '%H:%M' or any other datetime/time format
     :return: valid datetime.time or raises ValueError
     """
     try:
-        return datetime.datetime.strptime(time_str, format_time).time()
+        return datetime.datetime.strptime(time_str, format_str).time()
     except ValueError:
         raise ValueError

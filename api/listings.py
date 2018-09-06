@@ -4,7 +4,7 @@
 from typing import NamedTuple, List
 from decimal import Decimal
 from utils.logger import logger
-from utils.functions import get_time
+from utils.functions import format_time
 from config.settings import get_config
 
 
@@ -13,9 +13,8 @@ DATETIME_FORMAT = get_config('datetime_format')
 
 class Listing(NamedTuple):
     """
-    Simple listing structure.
-    NOTE: Setting defaults to fields we don't operate on,
-          just in case they don't get passed by upstream API.
+    Basic Listing class. Setting defaults to fields we don't operate on,
+    just in case they don't get passed by upstream API.
     """
     sellprice: str
     starrating: str
@@ -44,7 +43,7 @@ class Listing(NamedTuple):
 
 
 def prepare_search_results(listings: List[Listing])-> str:
-    """ Formats offers for final response """
+    """ Formats offers for final response as defined in the spec"""
     result = {"summary": {}, "offers": []}
 
     if listings:
@@ -71,7 +70,7 @@ def prepare_search_results(listings: List[Listing])-> str:
     return result
 
 
-def get_results(listings: List[Listing], search_criteria: dict)-> list:
+def search_listings(listings: List[Listing], search_criteria: dict)-> list:
     """ Get listings which match the desired criteria """
 
     if not search_criteria:
@@ -89,11 +88,11 @@ def get_results(listings: List[Listing], search_criteria: dict)-> list:
             match.append(Decimal(listing.sellprice) >= search_criteria.get('min_price'))
         if search_criteria.get('earliest_departure_time'):
             match.append(
-                get_time(listing.outbounddep, DATETIME_FORMAT) >=
+                format_time(listing.outbounddep, DATETIME_FORMAT) >=
                 search_criteria.get('earliest_departure_time'))
         if search_criteria.get('earliest_return_time'):
             match.append(
-                get_time(listing.inbounddep, DATETIME_FORMAT) >=
+                format_time(listing.inbounddep, DATETIME_FORMAT) >=
                 search_criteria.get('earliest_return_time'))
         return all(match)
 
