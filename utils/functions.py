@@ -5,6 +5,9 @@ import decimal
 import uuid
 import json
 from typing import Any
+from config.settings import get_config
+
+TIME_FORMAT = get_config('time_format')
 
 
 def json_handler(obj: Any)-> str:
@@ -22,7 +25,7 @@ def json_handler(obj: Any)-> str:
     return json.JSONEncoder().default(obj)
 
 
-def format_time(time_str: str, format_str: str)-> datetime.time:
+def format_time(time_str: str, format_str: str = TIME_FORMAT)-> datetime.time:
     """
     Given time_string converts to valid datetime.time
     :param time_str: ie. '20:34' or '23/02/2019 20:32'

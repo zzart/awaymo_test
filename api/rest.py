@@ -25,23 +25,21 @@ def check_types(req, resp, params):
     :param params: dict of query params
     :return: HTTP Error **400** or pass through upon successful validation
     """
-    try:
-        if req.get_param('earliest_departure_time'):
-            format_time(req.get_param('earliest_departure_time'), TIME_FORMAT)
-        if req.get_param('earliest_return_time'):
-            format_time(req.get_param('earliest_return_time'), TIME_FORMAT)
-    except ValueError as e:
-        logger.error(e)
-        raise HTTPError(HTTP_400, "One of the time params could not be parsed.")
+    types = (
+        ('earliest_departure_time', format_time),
+        ('earliest_return_time', format_time),
+        ('max_price', Decimal),
+        ('min_price', Decimal),
+        ('star_rating', int)
+    )
 
     try:
-        if req.get_param('max_price'):
-            Decimal(req.get_param('max_price'))
-        if req.get_param('min_price'):
-            Decimal(req.get_param('min_price'))
-    except decimal.InvalidOperation as e:
+        for item in types:
+            if req.get_param(item[0]):
+                item[1](req.get_param(item[0]))
+    except (ValueError, decimal.InvalidOperation) as e:
         logger.error(e)
-        raise HTTPError(HTTP_400, "One of the price params could not be parsed.")
+        raise HTTPError(HTTP_400, f"{item[0]} could not be parsed.")
 
 
 class SearchResource(object):

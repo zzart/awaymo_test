@@ -42,32 +42,25 @@ def test_search_multiple_params(client, search_url):
 
 
 def test_check_malformatted_times(client, search_url):
-    doc = {'title': 'One of the time params could not be parsed.'}
     result = client.simulate_get(search_url, params={
         'earliest_departure_time': 'foo',
         'earliest_return_time': 'bar',
     })
     assert result.status_code == 400
-    assert result.json == doc
 
 
 def test_check_malformatted_numbers(client, search_url):
-    doc = {'title': 'Invalid parameter',
-           'description': 'The "star_rating" parameter is invalid. The value must be an integer.'}
     result = client.simulate_get(search_url, params={
         'star_rating': 'foo',
     })
     assert result.status_code == 400
-    assert result.json == doc
 
 
 def test_check_malformatted_decimals(client, search_url):
-    doc = {'title': 'One of the price params could not be parsed.'}
     result = client.simulate_get(search_url, params={
         'max_price': 'foo',
     })
     assert result.status_code == 400
-    assert result.json == doc
 
 
 def test_check_only_get_is_working(client, search_url):
